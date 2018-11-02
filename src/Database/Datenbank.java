@@ -8,17 +8,23 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
 
-public class Connect {
+public class Datenbank {
+	//Zugangsdaten für Datenbank
 	private String server = "localhost";
 	private String user = "root";
 	private String password = "";
+	private String datasource = "probeipa_sozialesnetzwerk";
+	private Connection connect;
 	
-	public Connect(String datasource){
+	public Datenbank(){
+		//URL zum Verbinden zu MySQL
 		String url = "jdbc:mysql://" + server + "/" + datasource + "?user=" + user + "&password=" + password + "&serverTimezone=UTC";
 		try {
+			//JDBC-Treiber laden
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			try {
-				Connection connect = DriverManager.getConnection(url);
+				//Verbindung aufbauen
+				connect = DriverManager.getConnection(url);
 				//System.out.println(connect.getCatalog());
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -27,5 +33,9 @@ public class Connect {
 			e.printStackTrace();
 		}
 		
+	}
+	
+	public Connection getConnect(){
+		return this.connect;
 	}
 }
