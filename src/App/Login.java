@@ -10,38 +10,47 @@ import java.sql.SQLException;
 import Database.Datenbank;
 
 public class Login {
+	
+	//Variablen für Datenbankabfragen
 	private Datenbank db = new Datenbank();
 	private PreparedStatement ps;
 	private Connection con;
 	private ResultSet rs;
 	
+	//Gekapselte Variablen: Logininformationen
 	private String username = null;
 	private String password = null;
 	private Integer id2;
 	private Boolean logged = false;
+	private int rolle;
 	
-	
+	//Konstruktor 1: Für Login
 	public Login(String benutzername, String passwort){
-		System.out.println(benutzername + "---" + getHashedPasswort(1+passwort));
-		con = db.getConnect();
-		setLogged(checkValidUser(benutzername, passwort));
+		con = db.getConnect();//Verbindet mit Datenbank
+		setLogged(checkValidUser(benutzername, passwort));//Überprüft Benutzerdaten und Passwort
 		
-		
-		System.out.println(benutzername + "---" + getHashedPasswort(passwort));	
 	}
 	
+	//Konstruktor 2: Lediglich für Funktionsaufruf
+	public Login(){
+		
+	}
 	
+	//Überprüft Benutzerdaten und Passwort
 	private Boolean checkValidUser(String benutzername, String passwort){
 		try {
+			///Lädt Benutzer aus Datenbank
 			ps = con.prepareStatement("CALL loadBenutzer(?)");
 			ps.setString(1, benutzername);
 			rs = ps.executeQuery();
 			
-			
+			//Setzt die Variablen mit den ermittelten Benutzerdaten
 			if(rs.next()){
 				id2 = rs.getInt("id_benutzer");
 				username = rs.getString("benutzername");
 				password = rs.getString("passwort");
+				rolle = rs.getInt("fs_benutzerrolle");
+				
 				System.out.println("BN: "+username);
 			}
 			
@@ -55,14 +64,7 @@ public class Login {
 		return false;
 	}
 	
-	public void login(Benutzer benutzer){
-		
-	}
-	
-	public void logout(Benutzer benutzer){
-		
-	}
-	
+	//Verschlüsselt das Passwort
 	public String getHashedPasswort(String passwort){
 		try {
 			MessageDigest md5 = MessageDigest.getInstance("MD5");
@@ -77,6 +79,7 @@ public class Login {
 		return null;
 	}
 	
+	//Getter und Seter für Logged
 	public void setLogged(Boolean b){
 		this.logged = b;
 	}
@@ -84,5 +87,16 @@ public class Login {
 	public Boolean getLogged(){
 		return logged;
 	}
+	
+	//Getter für Id
+	public int getId(){
+		return id2;
+	}
+	
+	//Getter für Benutzerrolle
+	public int getRolle(){
+		return rolle;
+	}
+	
 	
 }

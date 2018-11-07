@@ -25,7 +25,6 @@ public class Datenbank {
 			try {
 				//Verbindung aufbauen
 				connect = DriverManager.getConnection(url);
-				//System.out.println(connect.getCatalog());
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -35,6 +34,7 @@ public class Datenbank {
 		
 	}
 	
+	//Verbindung aufbauen
 	public Connection getConnect(){
 		return this.connect;
 	}

@@ -1,5 +1,12 @@
 package App;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import Database.Datenbank;
+
 public class Benutzer {
 	//Gekapselte Variablen: Benutzerinformationen
 	private int id;
@@ -11,6 +18,13 @@ public class Benutzer {
 	private String benutzerrolle;
 	private int gesperrt;
 	private String profilbildurl;
+	
+	//Variablen für Datenbankabfragen
+	private Datenbank db = new Datenbank();
+	private Login login = new Login();
+	private PreparedStatement ps;
+	private Connection con = db.getConnect();
+	private ResultSet rs;
 	
 	//Getter und Setter für Id
 	public int getId() {
@@ -84,11 +98,68 @@ public class Benutzer {
 		this.profilbildurl = profilbildurl;
 	}
 	
+	//Sperrt einen Benutzer
 	public void sperren(int id){
 		
 	}
 	
-	public void registrieren(String benutzername, String passwort, String email, String vorname, String nachname, String profilildurl){
+	//Aktualisiert die Benutzerdaten
+	public void datenAendern(int id, String bn, String vorname, String nachname, String email){
+		
+		//Führt Datenmanipulation aus: aendereBenutzerdaten()
+		try {
+			ps = con.prepareStatement("CALL aendereBenutzerdaten(?, ?, ?, ?, ?)");
+			ps.setInt(1, id);
+			ps.setString(2, bn);
+			ps.setString(3, vorname);
+			ps.setString(4, nachname);
+			ps.setString(5, email);
+			ps.executeUpdate();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	//Registriert einen neuen Benutzer
+	public void registrieren(String benutzername, String passwort, String email, String vorname, String nachname, String profilbildurl){
+		
+		//Führt Datenmanipulation aus: register()
+		try {
+			ps = con.prepareStatement("CALL register(?, ?, ?, ?, ?)");
+			ps.setString(1, benutzername);
+			ps.setString(2, vorname);
+			ps.setString(3, nachname);
+			ps.setString(4, email);
+			ps.setString(5, "-");
+			ps.executeUpdate();
+			
+			//Lädt den neu registrierten Benutzer aus der Datenbank
+			ps = con.prepareStatement("CALL loadBenutzer(?)");
+			ps.setString(1, benutzername);
+			rs = ps.executeQuery();
+			
+			
+			if(rs.next()){
+				try{
+					//Setzt die Id des neuen Benutzers
+					setId(rs.getInt("id_benutzer"));
+					
+					//Fügt das verschlüsselte Passwort ein
+					ps = con.prepareStatement("CALL registerPasswort(?, ?)");
+					ps.setInt(1, getId());
+					ps.setString(2, login.getHashedPasswort(getId()+passwort));//Passwort verschlüsselt mit ID und Passworttext
+					ps.executeUpdate();
+					
+				}catch(NumberFormatException e){
+					e.printStackTrace();
+				}	
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
 		
 	}
 	
