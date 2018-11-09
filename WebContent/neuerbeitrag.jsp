@@ -6,19 +6,29 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <%
-	
-	if(session.getAttribute("rolle").toString().isEmpty()){
+	//Überprüfen ob eingeloggt
+	if(session.getAttribute("id").toString().isEmpty()){
 		response.sendRedirect("login.jsp");
 	}
-
+	
+	
 	Datenbank db = new Datenbank();
+	
+	//Variablen für den neuen Beitrag
 	String titel = request.getParameter("titel");
 	String beschreibung = request.getParameter("beschreibung");
+	
+	//Aktuelles Datum ermitteln
 	Calendar cal = new GregorianCalendar();
 	Date dt = new Date(cal.getTime().getTime());
+	
+	//Benutzer-ID gesetzt
 	int benutzer = Integer.parseInt(session.getAttribute("id").toString());
+	
+	//Neues Objekt für neuen Beitrag erstellen
 	Beitrag b = new Beitrag(db.getConnect());
 	
+	//Felder überprüfen und Informationen in Datenbank schreiben (Beitrag posten)
 	if(titel!=null && beschreibung!=null){
 		if(titel!="" && beschreibung!=""){
 			b.neu(titel, beschreibung, dt, benutzer);

@@ -67,11 +67,11 @@ public class Login {
 	//Verschlüsselt das Passwort
 	public String getHashedPasswort(String passwort){
 		try {
-			MessageDigest md5 = MessageDigest.getInstance("MD5");
-			byte[] array = md5.digest(passwort.getBytes());
+			MessageDigest md5 = MessageDigest.getInstance("MD5"); //Einwegverschlüsselungsart auswählen
+			byte[] array = md5.digest(passwort.getBytes());//Wandelt das eingegebene Passwort in Bytes um
 			StringBuffer sb = new StringBuffer();
 	        for (int i = 0; i < array.length; ++i) {
-	          sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1,3));
+	          sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1,3)); //Wandelt jedes Zeichen in HEX um
 	        }
 	        return sb.toString();
 		} catch (NoSuchAlgorithmException e) {

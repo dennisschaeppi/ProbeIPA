@@ -10,51 +10,59 @@
     pageEncoding="ISO-8859-1"%>
     
 <%
-	
-	if(session.getAttribute("rolle").toString().isEmpty()){
+	//Überprüfen ob eingeloggt
+	if(session.getAttribute("id").toString().isEmpty()){
 		response.sendRedirect("login.jsp");
 	}
+
+	//Datenbankverbindung herstellen
 	Datenbank db = new Datenbank();
 	Connection con = db.getConnect();
 	
+	//Benutzer-ID gesetzt
 	int benutzer = Integer.parseInt(session.getAttribute("id").toString());
 	
+	//Variablen für Datenbankabfragen
 	PreparedStatement ps;
 	PreparedStatement psCom;
 	ResultSet rs;
 	ResultSet rsCom;
 	
+	//Liste der vorhandenen Beiträge
 	HashMap<Integer, Beitrag> beitraege = new HashMap<Integer, Beitrag>();
 	
+	//Lade alle Beiträge
 	ps = con.prepareStatement("CALL loadBeitraege()");
 	rs = ps.executeQuery();
 	
 	while(rs.next()){
+		//Erstelle ein neues Objekt für Beitrag
 		Beitrag beitrag = new Beitrag(db.getConnect());
+		//Die ermittelten Informationen in das Objekt speichern
 		beitrag.setBenutzername(rs.getString("benutzername"));
 		beitrag.setTitel(rs.getString("titel"));
 		beitrag.setBeschreibung(rs.getString("beschreibung"));
 		beitrag.setDatum(rs.getDate("datum"));
 		beitrag.setId(rs.getInt("id_beitrag"));
 		
+		//Schreibe den Beitrag in die Liste
 		beitraege.put(beitrag.getId(), beitrag);
 	}
 	
+	//Ermitteln aller Formular-Elemente
 	Enumeration<String> en = request.getParameterNames();
 	while(en.hasMoreElements()){
+		
 		String parameter = en.nextElement();
 		
+		//Wenn Kommentar abgesendet dann in DB schreiben
 		if(parameter.contains("comment-writer")){
-			//System.out.println(request.getParameter(parameter));
 			int beitrag = Integer.parseInt(parameter.split("-")[2]);
 			Beitrag b = new Beitrag(db.getConnect());
+			
 			b.schreibeKommentar(beitrag, benutzer, request.getParameter(parameter));
 		}
-		System.out.println(en.nextElement());
-		
 	}
-	
-	
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -109,7 +117,7 @@
 							while(rsCom.next()){
 						%>
 								<p>Kommentar von: <%=rsCom.getString("benutzername") %>
-									<br> 
+									<br>
 									<%=rsCom.getString("text") %>
 								</p>
 						<%

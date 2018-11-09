@@ -2,6 +2,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
  <%
+ 	//Variablen für die Benutzereingaben
  	String benutzername = request.getParameter("benutzername");
  	String vorname = request.getParameter("vorname");
  	String nachname = request.getParameter("nachname");
@@ -11,12 +12,13 @@
  	String profilbildurl="";
  	
  	
- 	
+ 	//Neues Benutzer-Objekt erstellen
  	Benutzer b = new Benutzer();
+ 	//Eigabedaten überprüfen und dann in DB eintragen
  	if(benutzername!=null && vorname!=null && nachname!=null && email!=null && passwort!=null && passwort_r!=null){
  		if(benutzername!="" && vorname!="" && nachname!="" && email!="" && passwort!="" && passwort_r!=""){
  	 		b.registrieren(benutzername, passwort, email, vorname, nachname, profilbildurl);
- 	 		response.sendRedirect("login.jsp");
+ 	 		response.sendRedirect("login.jsp");//Weiterleitung zum Login
  	 	}	
  	}
  %>

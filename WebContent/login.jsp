@@ -2,20 +2,23 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <%
+
+//Anmeldeinformationen in Parameter speichern
 String benutzername = request.getParameter("benutzername");
 String passwort = request.getParameter("passwort");
+
+//Rückmeldung für das Login
 String message = "Anmelden";
-System.out.println(benutzername + "--- "+passwort);
+
+//Anmeldeinformationen überpfrüfen
 if(benutzername != null && passwort != null && benutzername!= "" && passwort != ""){
 	Login login = new Login(benutzername, passwort);
+	//Wenn Login erfolgreich, dann Session setzten und weiterleiten
 	if(login.getLogged()){
-		//message="YEY";
 		HttpSession s = request.getSession(true);
 		session.setAttribute("id", login.getId());
 		session.setAttribute("rolle", login.getRolle());
 		response.sendRedirect("beitrag.jsp");
-	}else{
-		
 	}
 }else{
 	message="Benutzername und Passwort eingeben";

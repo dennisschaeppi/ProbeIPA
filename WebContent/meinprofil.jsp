@@ -8,22 +8,29 @@
     pageEncoding="ISO-8859-1"%>
     
 <%
-	if(session.getAttribute("rolle").toString().isEmpty()){
+	//Überprüfen ob eingeloggt
+	if(session.getAttribute("id").toString().isEmpty()){
 		response.sendRedirect("login.jsp");
 	}
-
+	
+	//Datenbankverbindung
 	Datenbank db = new Datenbank();
 	Connection con = db.getConnect();
+	
+	//Variablen für Datenbankabfragen
 	PreparedStatement ps;
 	ResultSet rs;
 	Benutzer profil = new Benutzer();
 	
+	//Benutzer-ID gesetzt
 	Integer benutzer = Integer.parseInt(session.getAttribute("id").toString());
 	
+	//Lade den angemeldeten Benutzer nach der Session ID
 	ps = con.prepareStatement("CALL loadBenutzer(?)");
 	ps.setString(1, benutzer.toString());
 	rs = ps.executeQuery();
 	
+	//Setze die Informationen zum Benutzer
 	if(rs.next()){
 		profil.setBenutzername(rs.getString("benutzername"));
 		profil.setVorname(rs.getString("vorname"));
@@ -31,12 +38,14 @@
 		profil.setEmail(rs.getString("email"));
 	}
 	
-	String benutzername = "";
+	//String benutzername = "";
 	
+	//Ermitteln aller Formular-Elemente
 	Enumeration<String> en = request.getParameterNames();
 	
 	while(en.hasMoreElements()){
 		String parameter = en.nextElement();
+		//Wenn Profil aktualisieren abgesendet, dann in DB aktualisieren
 		if(parameter.equals("aendern")){
 			System.out.println("ändern");
 			profil.datenAendern(benutzer, request.getParameter("benutzername"), request.getParameter("vorname"), request.getParameter("nachname"), request.getParameter("email"));
